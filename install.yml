@@ -2,7 +2,6 @@
 - name: Install Git, ChromeDriver, and Chromium Browser on Slave Node
   hosts: 34.239.106.143
   become: yes
-  become_user: ubuntu
   tasks:
 
     - name: Update and upgrade APT packages
