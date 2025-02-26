@@ -66,9 +66,23 @@
         state: directory
         mode: '0755'
 
-    - name: Download Selenium Server JAR
+    - name: Fetch the latest Selenium Server version
+      uri:
+        url: "https://api.github.com/repos/SeleniumHQ/selenium/releases/latest"
+        return_content: yes
+      register: selenium_release
+
+    - name: Extract the correct Selenium JAR download URL
+      set_fact:
+        selenium_download_url: "{{ selenium_release.json.assets | selectattr('name', 'search', 'selenium-server-.*\\.jar') | map(attribute='browser_download_url') | first }}"
+
+    - name: Debug Selenium Download URL
+      debug:
+        msg: "Downloading Selenium from {{ selenium_download_url }}"
+
+    - name: Download the latest Selenium Server JAR
       get_url:
-        url: "https://github.com/SeleniumHQ/selenium/releases/latest/download/selenium-server.jar"
+        url: "{{ selenium_download_url }}"
         dest: "/opt/selenium/selenium.jar"
         mode: '0755'
 
@@ -80,3 +94,4 @@
     - name: Display Selenium version
       debug:
         msg: "Selenium Server Version: {{ selenium_output.stdout }}"
+
