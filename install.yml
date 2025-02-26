@@ -2,6 +2,7 @@
 - name: Install Git, ChromeDriver, and Chromium Browser on Slave Node
   hosts: slave-node
   become: yes
+  become_user: ubuntu
   tasks:
 
     - name: Update and upgrade APT packages
