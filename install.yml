@@ -60,3 +60,23 @@
         path: /usr/local/bin/chromedriver
         mode: '0755'
         state: file
+    - name: Create directory for Selenium
+      file:
+        path: /opt/selenium
+        state: directory
+        mode: '0755'
+
+    - name: Download Selenium Server JAR
+      get_url:
+        url: "https://github.com/SeleniumHQ/selenium/releases/latest/download/selenium-server.jar"
+        dest: "/opt/selenium/selenium.jar"
+        mode: '0755'
+
+    - name: Verify Selenium installation
+      command: "java -jar /opt/selenium/selenium.jar --version"
+      register: selenium_output
+      changed_when: false
+
+    - name: Display Selenium version
+      debug:
+        msg: "Selenium Server Version: {{ selenium_output.stdout }}"
