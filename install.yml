@@ -1,0 +1,62 @@
+---
+- name: Install Git, ChromeDriver, and Chromium Browser on Slave Node
+  hosts: slaves
+  become: yes
+  tasks:
+
+    - name: Update and upgrade APT packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - name: Install dependencies for Chromium and ChromeDriver
+      apt:
+        name:
+          - wget
+          - unzip
+          - curl
+          - xvfb
+          - libxi6
+          - libgconf-2-4
+        state: present
+
+    - name: Install Chromium Browser
+      apt:
+        name: chromium-browser
+        state: present
+
+    - name: Get latest ChromeDriver version
+      shell: "curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+      register: chromedriver_version
+
+    - name: Download and Install ChromeDriver
+      get_url:
+        url: "https://chromedriver.storage.googleapis.com/{{ chromedriver_version.stdout }}/chromedriver_linux64.zip"
+        dest: "/tmp/chromedriver.zip"
+
+    - name: Extract ChromeDriver
+      unarchive:
+        src: "/tmp/chromedriver.zip"
+        dest: "/usr/local/bin/"
+        remote_src: yes
+        mode: '0755'
+
+    - name: Verify ChromeDriver installation
+      command: chromedriver --version
+      register: chromedriver_output
+      changed_when: false
+
+    - name: Display ChromeDriver version
+      debug:
+        msg: "ChromeDriver Version: {{ chromedriver_output.stdout }}"
+
+    - name: Ensure ChromeDriver is executable
+      file:
+        path: /usr/local/bin/chromedriver
+        mode: '0755'
+        state: file
