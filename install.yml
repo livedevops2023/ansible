@@ -1,6 +1,6 @@
 ---
 - name: Install Git, ChromeDriver, and Chromium Browser on Slave Node
-  hosts: slave-node
+  hosts: localhost
   become: yes
   tasks:
 
